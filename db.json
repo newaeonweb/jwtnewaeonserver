@@ -1,0 +1,32 @@
+{
+  "users": [
+    {
+      "email": "johnny@cash.com",
+      "username": "Johnny Cash",
+      "password": "123456",
+      "type": "Requirer",
+      "id": 1
+    },
+    {
+      "email": "frank@sinatra.com",
+      "username": "frank",
+      "password": "123456",
+      "type": "Investor",
+      "id": 2
+    }
+  ],
+  "balance": [
+    {
+      "id": 1,
+      "value": "20.000",
+      "userId": 1
+    },
+    {
+      "id": 2,
+      "value": "5.000",
+      "userId": 2
+    }
+  ],
+  "bank": [],
+  "password_reset_tokens": []
+}
