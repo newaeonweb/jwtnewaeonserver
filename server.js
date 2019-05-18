@@ -53,12 +53,26 @@ let allowEnpoints = [
   '/api-password-reset',
   '/api-password-reset-confirm',
 ];
+
 /*=============================================
 =             Application Interceptor         =
 =============================================*/
+// // Avoid CORS issue
+// server.use(function(req, res, next) {
+//   res.header('Access-Control-Allow-Origin', '*');
+//   res.header(
+//     'Access-Control-Allow-Headers',
+//     'Origin, X-Requested-With, Content-Type, Accept'
+//   );
+//   next();
+// });
+
 server.use((req, res, next) => {
   // Check permited Endpoints
-  if (allowEnpoints.indexOf(req.url) >= 0) {
+  if (
+    allowEnpoints.indexOf(req.url) >= 0 ||
+    req.url.substring(0, 6) == '/apidoc'
+  ) {
     return next();
   }
   // Get Token from request headers
@@ -90,13 +104,56 @@ server.use((req, res, next) => {
 =               TOKEN GENERATOR               =
 =============================================*/
 
-// GET Token
+/**
+ * @api {post} /api-token-auth User Signup
+ * @apiDescription User must exist on database
+ * @apiGroup User
+ *
+ * @apiParam {String} email User email address.
+ * @apiParam {String} password User password.
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     {
+ *        "auth": true,
+ *          "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",
+ *          "user": {
+ *            "email": "johnny@cash.com",
+ *            "username": "Johnny Cash",
+ *            "password": "123456",
+ *            "type": "Requirer",
+ *            "id": 1
+ *          }
+ *      }
+ *
+ * @apiError BadRequest The request could not be understood by the server due to malformed syntax.
+ * @apiError NotFound The server has not found anything matching the Request-URI.
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 400 Bad Request
+ *     {
+ *       "Sorry, email or password not provide"
+ *     }
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 400 Bad Request
+ *     {
+ *       "Sorry, invalid combination of email and password"
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 404 Not Found
+ *     {
+ *       "You don't have an account yet"
+ *     }
+ */
 server.post('/api-token-auth', (req, res) => {
   // Get payload request
   const payload = req.body;
   // Check for empty fields
   if (!payload.email || !payload.password) {
-    return res.sendStatus(HTTP_STATUS.Unauthorized);
+    return res
+      .status(HTTP_STATUS.BadRequest)
+      .send('Sorry, email or password not provide');
   }
   // Get user from db
   let user = db
@@ -127,7 +184,38 @@ server.post('/api-token-auth', (req, res) => {
   });
 });
 
-//  REFRESH Token
+/**
+ * @api {post} /api-token-refresh Refresh User Token
+ * @apiDescription Refresh user token using the current one. Tokens are valid for 24hours.
+ * @apiHeader {String} authorization Users unique access-token.
+ * @apiHeaderExample {json} Header-Example:
+ *     {
+ *       "Authorization": "Bearer <token>"
+ *     }
+ * @apiGroup Token
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     {
+ *        "auth": true,
+ *          "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",
+ *          "user": {
+ *            "email": "johnny@cash.com",
+ *            "username": "Johnny Cash",
+ *            "password": "123456",
+ *            "type": "Requirer",
+ *            "id": 1
+ *          }
+ *      }
+ *
+ * @apiError UnprocessableEntity The server understands the content type of the request entity but was unable to process the contained instructions.
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 422 Unprocessable Entity
+ *     {
+ *       "Refresh Token failed"
+ *     }
+ */
 server.get('/api-token-refresh', (req, res) => {
   // Get Token from Request Header
   let token = req.headers['authorization'];
@@ -164,7 +252,28 @@ server.get('/api-token-refresh', (req, res) => {
 =                 User Settings               =
 =============================================*/
 
-// Change Password for logged Users {Params: password, new_passoword}
+/**
+ * @api {post} /users/change-password Change Password
+ * @apiDescription Only logged users can change their password.
+ * @apiGroup Profile
+ *
+ * @apiParam {String} current user password.
+ * @apiParam {String} new password User password.
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     {
+ *        "Your password has changed"
+ *     }
+ *
+ * @apiError BadRequest The request could not be understood by the server due to malformed syntax.
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 400 Bad Request
+ *     {
+ *       "Your current password is invalid"
+ *     }
+ */
 server.post('/users/change-password', (req, res) => {
   // Get current password from Request body
   let password = req.body.password;
@@ -198,7 +307,27 @@ server.post('/users/change-password', (req, res) => {
 =                  API Settings               =
 =============================================*/
 
-// Reset password for non logged users {Params: email}
+/**
+ * @api {post} /api-password-reset Reset Password
+ * @apiDescription Reset password for non logged users.
+ * @apiGroup User
+ *
+ * @apiParam {String} user email.
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     {
+ *        "token": "<temporary token>"
+ *     }
+ *
+ * @apiError UnprocessableEntity The server understands the content type of the request entity but was unable to process the contained instructions.
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 422 Unprocessable Entity
+ *     {
+ *       "You don't have an account yet"
+ *     }
+ */
 server.post('/api-password-reset', (req, res) => {
   // Get email from request body
   let email = req.body.email;
@@ -228,7 +357,28 @@ server.post('/api-password-reset', (req, res) => {
   res.status(200).send({ token: token });
 });
 
-// Validate new password request {Params: token, new password}
+/**
+ * @api {post} /api-password-reset-confirm Confirm Reset Password
+ * @apiDescription Confirm Reset password using temporary token and new password.
+ * @apiGroup User
+ *
+ * @apiParam {String} temporary token.
+ * @apiParam {String} user new password
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     {
+ *        "Your password was reseted"
+ *     }
+ *
+ * @apiError UnprocessableEntity The server understands the content type of the request entity but was unable to process the contained instructions.
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 422 Unprocessable Entity
+ *     {
+ *       "Missing or invalid temporary Token"
+ *     }
+ */
 server.post('/api-password-reset-confirm', (req, res) => {
   // Get new password from request body
   let new_password = req.body.new_password;
