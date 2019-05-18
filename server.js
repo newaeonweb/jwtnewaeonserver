@@ -81,7 +81,9 @@ app.use((req, res, next) => {
   // Get Token from request headers
   let token = req.headers['authorization'];
   if (!token) {
-    res.status(HTTP_STATUS.Unauthorized).send("Sorry you don't have access");
+    res
+      .status(HTTP_STATUS.Unauthorized)
+      .send('Sorry, missing or malformed token');
   } else {
     // Clean token string
     token = token.replace('Bearer ', '');
