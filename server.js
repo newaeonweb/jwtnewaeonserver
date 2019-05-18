@@ -16,8 +16,9 @@ const adapter = new FileSync('db.json');
 const db = low(adapter);
 const jwt = require('jsonwebtoken');
 
-// Variables
-const appSecretKey = 'someapisecrethere';
+// Config Constants
+const SECRET_KEY = 'someapisecrethere';
+const EXPIRES_IN = 86400; // 24h
 const HTTP_STATUS = {
   Ok: 200,
   Created: 201,
@@ -49,10 +50,10 @@ app.use(jsonServer.bodyParser);
 let allowEnpoints = [
   '/db',
   '/api/users',
-  '/api/api-token-auth',
-  '/api/api-token-refresh',
-  '/api/api-password-reset',
-  '/api/api-password-reset-confirm',
+  '/api/token-get',
+  '/api/token-refresh',
+  '/api/password-reset',
+  '/api/password-reset-confirm',
 ];
 
 /*=============================================
@@ -84,7 +85,7 @@ app.use((req, res, next) => {
     // Clean token string
     token = token.replace('Bearer ', '');
     // Validate token
-    jwt.verify(token, appSecretKey, function(error, decoded) {
+    jwt.verify(token, SECRET_KEY, function(error, decoded) {
       if (error) {
         return res
           .status(HTTP_STATUS.Unauthorized)
@@ -106,7 +107,7 @@ app.use((req, res, next) => {
 =============================================*/
 
 /**
- * @api {post} /api/api-token-auth Signup
+ * @api {post} /api/token-get Signup
  * @apiDescription User must exist on database
  * @apiGroup User
  *
@@ -147,7 +148,7 @@ app.use((req, res, next) => {
  *       "You don't have an account yet"
  *     }
  */
-app.post('/api/api-token-auth', (req, res) => {
+app.post('/api/token-get', (req, res) => {
   // Get payload request
   const payload = req.body;
   // Check for empty fields
@@ -176,7 +177,9 @@ app.post('/api/api-token-auth', (req, res) => {
       .send('Sorry, invalid combination of email and password');
   }
   // Generate a Token
-  const token = jwt.sign({ id: user.id }, appSecretKey, { expiresIn: 86400 });
+  const token = jwt.sign({ id: user.id }, SECRET_KEY, {
+    expiresIn: EXPIRES_IN,
+  });
   // Return a User Object with generated token
   res.status(200).send({
     auth: true,
@@ -186,7 +189,7 @@ app.post('/api/api-token-auth', (req, res) => {
 });
 
 /**
- * @api {post} /api/api-token-refresh Refresh User Token
+ * @api {post} /api/token-refresh Refresh User Token
  * @apiDescription Refresh user token using the current one. Tokens are valid for 24hours.
  * @apiHeader {String} authorization Users unique access-token.
  * @apiHeaderExample {json} Header-Example:
@@ -217,20 +220,20 @@ app.post('/api/api-token-auth', (req, res) => {
  *       "Refresh Token failed"
  *     }
  */
-app.get('/api/api-token-refresh', (req, res) => {
+app.get('/api/token-refresh', (req, res) => {
   // Get Token from Request Header
   let token = req.headers['authorization'];
   token = token.replace('Bearer ', '');
   // Check Token
-  jwt.verify(token, appSecretKey, function(error, decoded) {
+  jwt.verify(token, SECRET_KEY, function(error, decoded) {
     if (error) {
       return res
         .status(HTTP_STATUS.UnprocessableEntity)
         .send({ auth: false, message: 'Refresh Token failed' });
     }
     // Generate new Token
-    let token = jwt.sign({ id: decoded.id }, appSecretKey, {
-      expiresIn: 86400,
+    let token = jwt.sign({ id: decoded.id }, SECRET_KEY, {
+      expiresIn: EXPIRES_IN,
     });
     // Get User
     let user = db
@@ -350,7 +353,7 @@ app.post('/users/change-password', (req, res) => {
 =============================================*/
 
 /**
- * @api {post} /api/api-password-reset Reset Password
+ * @api {post} /api/password-reset Reset Password
  * @apiDescription Reset password for non logged users.
  * @apiGroup Password
  *
@@ -370,7 +373,7 @@ app.post('/users/change-password', (req, res) => {
  *       "You don't have an account yet"
  *     }
  */
-app.post('/api/api-password-reset', (req, res) => {
+app.post('/api/password-reset', (req, res) => {
   // Get email from request body
   let email = req.body.email;
   // Get User from db
@@ -387,7 +390,9 @@ app.post('/api/api-password-reset', (req, res) => {
   // Set User
   user = user[0];
   // Generate a temporary Token
-  const token = jwt.sign({ id: user.id }, appSecretKey, { expiresIn: 86400 });
+  const token = jwt.sign({ id: user.id }, SECRET_KEY, {
+    expiresIn: EXPIRES_IN,
+  });
   // Save new generated Token on password resets table
   db.get('password_reset_tokens')
     .push({
@@ -400,7 +405,7 @@ app.post('/api/api-password-reset', (req, res) => {
 });
 
 /**
- * @api {post} /api/api-password-reset-confirm Confirm Reset Password
+ * @api {post} /api/password-reset-confirm Reset Password Confirm
  * @apiDescription Confirm Reset password using temporary token and new password.
  * @apiGroup Password
  *
@@ -421,7 +426,7 @@ app.post('/api/api-password-reset', (req, res) => {
  *       "Missing or invalid temporary Token"
  *     }
  */
-app.post('/api/api-password-reset-confirm', (req, res) => {
+app.post('/api/password-reset-confirm', (req, res) => {
   // Get new password from request body
   let new_password = req.body.new_password;
   let token = db
