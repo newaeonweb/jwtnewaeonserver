@@ -106,7 +106,7 @@ app.use((req, res, next) => {
 =============================================*/
 
 /**
- * @api {post} /api/api-token-auth User Signup
+ * @api {post} /api/api-token-auth Signup
  * @apiDescription User must exist on database
  * @apiGroup User
  *
@@ -254,7 +254,7 @@ app.get('/api/api-token-refresh', (req, res) => {
 =============================================*/
 
 /**
- * @api {post} /api/users Create User
+ * @api {post} /api/users Register
  * @apiDescription Create a new User.
  * @apiGroup User
  *
@@ -299,8 +299,8 @@ app.post('/api/users', (req, res, next) => {
  * @apiDescription Only logged users can change their password.
  * @apiGroup Profile
  *
- * @apiParam {String} current user password.
- * @apiParam {String} new password User password.
+ * @apiParam {String} password User current password.
+ * @apiParam {String} new_password User new password.
  *
  * @apiSuccessExample Success-Response:
  *     HTTP/1.1 200 OK
@@ -354,7 +354,7 @@ app.post('/users/change-password', (req, res) => {
  * @apiDescription Reset password for non logged users.
  * @apiGroup Password
  *
- * @apiParam {String} user email.
+ * @apiParam {String} email User email.
  *
  * @apiSuccessExample Success-Response:
  *     HTTP/1.1 200 OK
@@ -404,8 +404,8 @@ app.post('/api/api-password-reset', (req, res) => {
  * @apiDescription Confirm Reset password using temporary token and new password.
  * @apiGroup Password
  *
- * @apiParam {String} temporary token.
- * @apiParam {String} user new password
+ * @apiParam {String} token Temporary token generated on Reset password.
+ * @apiParam {String} password User new password
  *
  * @apiSuccessExample Success-Response:
  *     HTTP/1.1 200 OK
