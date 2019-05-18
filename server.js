@@ -51,7 +51,7 @@ app.use(jsonServer.bodyParser);
 let allowEnpoints = [
   '/db',
   '/api/register',
-  '/api/token-get',
+  '/api/signup',
   '/api/token-refresh',
   '/api/password-reset',
   '/api/password-reset-confirm',
@@ -106,88 +106,6 @@ app.use((req, res, next) => {
 /*=============================================
 =               TOKEN GENERATOR               =
 =============================================*/
-
-/**
- * @api {post} /api/token-get Signup
- * @apiDescription User must exist on database
- * @apiGroup User
- *
- * @apiParam {String} email User email address.
- * @apiParam {String} password User password.
- *
- * @apiSuccessExample Success-Response:
- *     HTTP/1.1 200 OK
- *     {
- *        "auth": true,
- *          "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",
- *          "user": {
- *            "email": "johnny@cash.com",
- *            "username": "Johnny Cash",
- *            "password": "123456",
- *            "type": "Requirer",
- *            "id": 1
- *          }
- *      }
- *
- * @apiError BadRequest The request could not be understood by the server due to malformed syntax.
- * @apiError NotFound The server has not found anything matching the Request-URI.
- *
- * @apiErrorExample Error-Response:
- *     HTTP/1.1 400 Bad Request
- *     {
- *       "Sorry, email or password not provide"
- *     }
- * @apiErrorExample Error-Response:
- *     HTTP/1.1 400 Bad Request
- *     {
- *       "Sorry, invalid combination of email and password"
- *     }
- *
- * @apiErrorExample Error-Response:
- *     HTTP/1.1 404 Not Found
- *     {
- *       "You don't have an account yet"
- *     }
- */
-app.post('/api/token-get', (req, res) => {
-  // Get payload request
-  const payload = req.body;
-  // Check for empty fields
-  if (!payload.email || !payload.password) {
-    return res
-      .status(HTTP_STATUS.BadRequest)
-      .send('Sorry, email or password not provide');
-  }
-  // Get user from db
-  let user = db
-    .get('users')
-    .filter(user => user.email === payload.email)
-    .value();
-  //  Check if User exist on db
-  if (user.length === 0) {
-    return res
-      .status(HTTP_STATUS.NotFound)
-      .send("You don't have an account yet");
-  }
-  // Set user
-  user = user[0];
-  // Check user password
-  if (user.password !== payload.password) {
-    return res
-      .status(HTTP_STATUS.BadRequest)
-      .send('Sorry, invalid combination of email and password');
-  }
-  // Generate a Token
-  const token = jwt.sign({ id: user.id }, SECRET_KEY, {
-    expiresIn: EXPIRES_IN,
-  });
-  // Return a User Object with generated token
-  res.status(200).send({
-    auth: true,
-    token: token,
-    user: user,
-  });
-});
 
 /**
  * @api {post} /api/token-refresh Refresh User Token
@@ -254,7 +172,7 @@ app.get('/api/token-refresh', (req, res) => {
 /*==========  End of TOKEN GENERATOR  ========*/
 
 /*=============================================
-=                 User Settings               =
+=           User Register and Login           =
 =============================================*/
 
 /**
@@ -315,6 +233,94 @@ app.post('/api/register', (req, res) => {
 });
 
 /**
+ * @api {post} /api/signup Signup
+ * @apiDescription User must exist on database
+ * @apiGroup User
+ *
+ * @apiParam {String} email User email address.
+ * @apiParam {String} password User password.
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     {
+ *        "auth": true,
+ *          "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",
+ *          "user": {
+ *            "email": "johnny@cash.com",
+ *            "username": "Johnny Cash",
+ *            "password": "123456",
+ *            "type": "Requirer",
+ *            "id": 1
+ *          }
+ *      }
+ *
+ * @apiError BadRequest The request could not be understood by the server due to malformed syntax.
+ * @apiError NotFound The server has not found anything matching the Request-URI.
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 400 Bad Request
+ *     {
+ *       "Sorry, email or password not provide"
+ *     }
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 400 Bad Request
+ *     {
+ *       "Sorry, invalid combination of email and password"
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 404 Not Found
+ *     {
+ *       "You don't have an account yet"
+ *     }
+ */
+app.post('/api/signup', (req, res) => {
+  // Get payload request
+  const payload = req.body;
+  // Check for empty fields
+  if (!payload.email || !payload.password) {
+    return res
+      .status(HTTP_STATUS.BadRequest)
+      .send('Sorry, email or password not provide');
+  }
+  // Get user from db
+  let user = db
+    .get('users')
+    .filter(user => user.email === payload.email)
+    .value();
+  //  Check if User exist on db
+  if (user.length === 0) {
+    return res
+      .status(HTTP_STATUS.NotFound)
+      .send("You don't have an account yet");
+  }
+  // Set user
+  user = user[0];
+  // Check user password
+  if (user.password !== payload.password) {
+    return res
+      .status(HTTP_STATUS.BadRequest)
+      .send('Sorry, invalid combination of email and password');
+  }
+  // Generate a Token
+  const token = jwt.sign({ id: user.id }, SECRET_KEY, {
+    expiresIn: EXPIRES_IN,
+  });
+  // Return a User Object with generated token
+  res.status(200).send({
+    auth: true,
+    token: token,
+    user: user,
+  });
+});
+
+/*=====  End of User Register and Login  ======*/
+
+/*=============================================
+=            User Profile Actions             =
+=============================================*/
+
+/**
  * @api {post} /users/change-password Change Password
  * @apiDescription Only logged users can change their password.
  * @apiGroup Profile
@@ -363,7 +369,7 @@ app.post('/users/change-password', (req, res) => {
   res.status(HTTP_STATUS.Ok).send('Your password has changed');
 });
 
-/*===========  End of User Settings  =========*/
+/*===========  End of User Profile Actions  =========*/
 
 /*=============================================
 =                  API Settings               =
