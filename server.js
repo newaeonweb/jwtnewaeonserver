@@ -217,7 +217,7 @@ app.post('/api/register', (req, res) => {
       .status(HTTP_STATUS.UnprocessableEntity)
       .send('Missing one or more mantatory fields');
   }
-
+  // Create a new user object
   const newUser = {
     id: shortid.generate(),
     email: email,
