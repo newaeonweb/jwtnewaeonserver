@@ -29,7 +29,7 @@ const HTTP_STATUS = {
   UnprocessableEntity: 422,
 };
 // Json server setup
-const server = jsonServer.create();
+const app = jsonServer.create();
 const router = jsonServer.router(source);
 // App middlewares
 const middlewares = [
@@ -42,23 +42,24 @@ const middlewares = [
       }),
   ],
 ];
-server.use(middlewares);
+app.use(middlewares);
 // Using JSON Server bodyParser for HTTP methods
-server.use(jsonServer.bodyParser);
+app.use(jsonServer.bodyParser);
 // Allow API endpoints
 let allowEnpoints = [
   '/db',
-  '/api-token-auth',
-  '/api-token-refresh',
-  '/api-password-reset',
-  '/api-password-reset-confirm',
+  '/api/users',
+  '/api/api-token-auth',
+  '/api/api-token-refresh',
+  '/api/api-password-reset',
+  '/api/api-password-reset-confirm',
 ];
 
 /*=============================================
 =             Application Interceptor         =
 =============================================*/
 // // Avoid CORS issue
-// server.use(function(req, res, next) {
+// app.use(function(req, res, next) {
 //   res.header('Access-Control-Allow-Origin', '*');
 //   res.header(
 //     'Access-Control-Allow-Headers',
@@ -67,7 +68,7 @@ let allowEnpoints = [
 //   next();
 // });
 
-server.use((req, res, next) => {
+app.use((req, res, next) => {
   // Check permited Endpoints
   if (
     allowEnpoints.indexOf(req.url) >= 0 ||
@@ -105,7 +106,7 @@ server.use((req, res, next) => {
 =============================================*/
 
 /**
- * @api {post} /api-token-auth User Signup
+ * @api {post} /api/api-token-auth User Signup
  * @apiDescription User must exist on database
  * @apiGroup User
  *
@@ -146,7 +147,7 @@ server.use((req, res, next) => {
  *       "You don't have an account yet"
  *     }
  */
-server.post('/api-token-auth', (req, res) => {
+app.post('/api/api-token-auth', (req, res) => {
   // Get payload request
   const payload = req.body;
   // Check for empty fields
@@ -185,7 +186,7 @@ server.post('/api-token-auth', (req, res) => {
 });
 
 /**
- * @api {post} /api-token-refresh Refresh User Token
+ * @api {post} /api/api-token-refresh Refresh User Token
  * @apiDescription Refresh user token using the current one. Tokens are valid for 24hours.
  * @apiHeader {String} authorization Users unique access-token.
  * @apiHeaderExample {json} Header-Example:
@@ -216,7 +217,7 @@ server.post('/api-token-auth', (req, res) => {
  *       "Refresh Token failed"
  *     }
  */
-server.get('/api-token-refresh', (req, res) => {
+app.get('/api/api-token-refresh', (req, res) => {
   // Get Token from Request Header
   let token = req.headers['authorization'];
   token = token.replace('Bearer ', '');
@@ -253,6 +254,47 @@ server.get('/api-token-refresh', (req, res) => {
 =============================================*/
 
 /**
+ * @api {post} /api/users Create User
+ * @apiDescription Create a new User.
+ * @apiGroup User
+ *
+ * @apiParam {String} email User email-address
+ * @apiParam {String} password User password.
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 201 Created
+ *     {
+ *        "email": "Jesse James",
+ *        "password": "123456",
+ *        "type": "Requirer",
+ *        "id": 1
+ *     }
+ *
+ * @apiError UnprocessableEntity The server understands the content type of the request entity but was unable to process the contained instructions.
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 422 Unprocessable Entity
+ *     {
+ *       "error": "Missing mandatory fields"
+ *     }
+ */
+app.post('/api/users', (req, res, next) => {
+  // Get resquest body
+  let email = req.body.email;
+  let password = req.body.password;
+  let type = req.body.type;
+  // Check mandatory fields
+  if (!email || !password || !type) {
+    return res
+      .status(HTTP_STATUS.UnprocessableEntity)
+      .send({ error: 'Missing mandatory fields' });
+  } else {
+    // Go ahead with JSON-Server
+    return next();
+  }
+});
+
+/**
  * @api {post} /users/change-password Change Password
  * @apiDescription Only logged users can change their password.
  * @apiGroup Profile
@@ -274,7 +316,7 @@ server.get('/api-token-refresh', (req, res) => {
  *       "Your current password is invalid"
  *     }
  */
-server.post('/users/change-password', (req, res) => {
+app.post('/users/change-password', (req, res) => {
   // Get current password from Request body
   let password = req.body.password;
   // Get new password from request body
@@ -308,9 +350,9 @@ server.post('/users/change-password', (req, res) => {
 =============================================*/
 
 /**
- * @api {post} /api-password-reset Reset Password
+ * @api {post} /api/api-password-reset Reset Password
  * @apiDescription Reset password for non logged users.
- * @apiGroup User
+ * @apiGroup Password
  *
  * @apiParam {String} user email.
  *
@@ -328,7 +370,7 @@ server.post('/users/change-password', (req, res) => {
  *       "You don't have an account yet"
  *     }
  */
-server.post('/api-password-reset', (req, res) => {
+app.post('/api/api-password-reset', (req, res) => {
   // Get email from request body
   let email = req.body.email;
   // Get User from db
@@ -358,9 +400,9 @@ server.post('/api-password-reset', (req, res) => {
 });
 
 /**
- * @api {post} /api-password-reset-confirm Confirm Reset Password
+ * @api {post} /api/api-password-reset-confirm Confirm Reset Password
  * @apiDescription Confirm Reset password using temporary token and new password.
- * @apiGroup User
+ * @apiGroup Password
  *
  * @apiParam {String} temporary token.
  * @apiParam {String} user new password
@@ -379,7 +421,7 @@ server.post('/api-password-reset', (req, res) => {
  *       "Missing or invalid temporary Token"
  *     }
  */
-server.post('/api-password-reset-confirm', (req, res) => {
+app.post('/api/api-password-reset-confirm', (req, res) => {
   // Get new password from request body
   let new_password = req.body.new_password;
   let token = db
@@ -409,7 +451,8 @@ server.post('/api-password-reset-confirm', (req, res) => {
 /*=============  End of API Settings  ========*/
 
 // Start server
-server.use(router);
-server.listen(3000, () => {
-  console.log('Application running...');
+app.use('/api', router);
+app.set('port', process.env.PORT || 3000);
+server = app.listen(app.get('port'), () => {
+  console.log('Application running on port: ' + server.address().port);
 });
