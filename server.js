@@ -262,8 +262,10 @@ app.get('/api/token-refresh', (req, res) => {
  * @apiDescription Create a new User.
  * @apiGroup User
  *
+ * @apiParam {String} username User name
  * @apiParam {String} email User email-address
  * @apiParam {String} password User password.
+ * @apiParam {String} type User profile type. Possible: Investor or Requirer
  *
  * @apiSuccessExample Success-Response:
  *     HTTP/1.1 201 Created
