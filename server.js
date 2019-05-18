@@ -15,6 +15,7 @@ const FileSync = require('lowdb/adapters/FileSync');
 const adapter = new FileSync('db.json');
 const db = low(adapter);
 const jwt = require('jsonwebtoken');
+const shortid = require('shortid');
 
 // Config Constants
 const SECRET_KEY = 'someapisecrethere';
@@ -49,7 +50,7 @@ app.use(jsonServer.bodyParser);
 // Allow API endpoints
 let allowEnpoints = [
   '/db',
-  '/api/users',
+  '/api/register',
   '/api/token-get',
   '/api/token-refresh',
   '/api/password-reset',
@@ -257,7 +258,7 @@ app.get('/api/token-refresh', (req, res) => {
 =============================================*/
 
 /**
- * @api {post} /api/users Register
+ * @api {post} /api/register Register
  * @apiDescription Create a new User.
  * @apiGroup User
  *
@@ -267,7 +268,8 @@ app.get('/api/token-refresh', (req, res) => {
  * @apiSuccessExample Success-Response:
  *     HTTP/1.1 201 Created
  *     {
- *        "email": "Jesse James",
+ *        "username":"Jesse James"
+ *        "email": "james@jesse.com",
  *        "password": "123456",
  *        "type": "Requirer",
  *        "id": 1
@@ -281,20 +283,33 @@ app.get('/api/token-refresh', (req, res) => {
  *       "error": "Missing mandatory fields"
  *     }
  */
-app.post('/api/users', (req, res, next) => {
-  // Get resquest body
-  let email = req.body.email;
-  let password = req.body.password;
-  let type = req.body.type;
-  // Check mandatory fields
-  if (!email || !password || !type) {
+app.post('/api/register', (req, res) => {
+  // Get new password from request body
+  const email = req.body.email;
+  const username = req.body.username;
+  const password = req.body.password;
+  const type = req.body.type;
+  // Check For Missing fields
+  if (!email || !username || !password || !type) {
     return res
       .status(HTTP_STATUS.UnprocessableEntity)
-      .send({ error: 'Missing mandatory fields' });
-  } else {
-    // Go ahead with JSON-Server
-    return next();
+      .send('Missing one or more mantatory fields');
   }
+
+  const newUser = {
+    id: shortid.generate(),
+    email: email,
+    username: username,
+    password: password,
+    type: type,
+  };
+
+  // Set new user
+  db.get('users')
+    .push(newUser)
+    .write();
+
+  res.status(HTTP_STATUS.Created).send(newUser);
 });
 
 /**
