@@ -122,13 +122,13 @@ app.use((req, res, next) => {
  * @apiSuccessExample Success-Response:
  *     HTTP/1.1 200 OK
  *     {
- *        "auth": true,
+ *          "auth": true,
  *          "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",
  *          "user": {
  *            "email": "johnny@cash.com",
  *            "username": "Johnny Cash",
  *            "password": "123456",
- *            "type": "Requirer",
+ *            "type": "Customer",
  *            "id": 1
  *          }
  *      }
@@ -185,7 +185,7 @@ app.get('/api/token-refresh', (req, res) => {
  * @apiParam {String} username User name
  * @apiParam {String} email User email-address
  * @apiParam {String} password User password.
- * @apiParam {String} type User profile type. Possible: Investor or Requirer
+ * @apiParam {String} type User profile type. Possible: Admin or Customer
  *
  * @apiSuccessExample Success-Response:
  *     HTTP/1.1 201 Created
@@ -193,7 +193,7 @@ app.get('/api/token-refresh', (req, res) => {
  *        "username":"Jesse James"
  *        "email": "james@jesse.com",
  *        "password": "123456",
- *        "type": "Requirer",
+ *        "type": "Customer",
  *        "id": 1
  *     }
  *
@@ -245,13 +245,13 @@ app.post('/api/register', (req, res) => {
  * @apiSuccessExample Success-Response:
  *     HTTP/1.1 200 OK
  *     {
- *        "auth": true,
+ *          "auth": true,
  *          "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",
  *          "user": {
  *            "email": "johnny@cash.com",
  *            "username": "Johnny Cash",
  *            "password": "123456",
- *            "type": "Requirer",
+ *            "type": "Customer",
  *            "id": 1
  *          }
  *      }

@@ -4,14 +4,14 @@
       "email": "johnny@cash.com",
       "username": "Johnny Cash",
       "password": "123456",
-      "type": "Requirer",
+      "type": "Admin",
       "id": 1
     },
     {
       "email": "frank@sinatra.com",
       "username": "frank",
       "password": "123456",
-      "type": "Investor",
+      "type": "Customer",
       "id": 2
     }
   ],
