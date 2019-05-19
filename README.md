@@ -1,12 +1,16 @@
-# NewAeonServer Restful API
+<h1 align="center">
+NewAeonServer Restful API
+</h1>
 
-Fake back-end Restful API powered by **JsonWebToken**, **Json-Server** and **ApiDoc**.
+<h3 align="center">Fake back-end Restful API powered by JsonWebToken, Json-Server and ApiDoc.<h3>
 
 <p align="center">
   <img width="800" height="449" src="./public/assets/newaeonserver.png">
 </p>
 
+<p align="center">
 A small deadly simple server, including endpoints to: Signup, Login, Refresh Token, Chance Profile Password, Reset Password and User Roles.
+</p>
 
 # How to use
 Download or clone the repository.
