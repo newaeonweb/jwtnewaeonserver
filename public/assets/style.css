@@ -11,13 +11,6 @@
 /* ==========================================================================
    Base styles: opinionated defaults
    ========================================================================== */
-
-html {
-  color: #222;
-  font-size: 1em;
-  line-height: 1.4;
-}
-
 /*
  * Remove text-shadow in selection highlight:
  * https://twitter.com/miketaylr/status/12228805301
@@ -95,22 +88,41 @@ textarea {
   padding: 0.2em 0;
 }
 
-
-
-
 /* ==========================================================================
    Author's custom styles
    ========================================================================== */
+/* Override defaults */
+:root {
+  --color-primary: #e78c14;
+  --color-lightGrey: #d2d6dd;
+  --color-grey: #7e818b;
+  --color-darkGrey: #3f4144;
+  --color-error: #d43939;
+  --color-success: #28bd14;
+  --grid-maxWidth: 120rem;
+  --grid-gutter: 2rem;
+  --font-size: 1.6rem;
+  --font-family: "Helvetica Neue", sans-serif;
+}
 
 h1 {
-
-  font-family: 'Asar',
-    serif;
+  font-family: 'Asar', serif;
 }
 
 h2 {
-  font-family: 'Oswald',
-    sans-serif;
+  font-family: 'Oswald', sans-serif;
+}
+
+.big-title {
+  font-size: 3em;
+}
+.lead {
+  font-size: 1.3em;
+}
+.screenshot p {
+  width: 60%;
+  margin: 20px auto;
+  color: #7e818b;
 }
 
 /* ==========================================================================
