@@ -8,14 +8,39 @@ Fake back-end Restful API powered by **JsonWebToken**, **Json-Server** and **Api
 
 A small deadly simple server, including endpoints to: Signup, Login, Refresh Token, Chance Profile Password, Reset Password and User Roles.
 
-# Authentication
-Including JWT Authentication
+# How to use
+Download or clone the repository.
 
-# Json-Server
-All Json-Server Features
+Install dependencies:
+```JavaScript
+npm install
+```
+Running the App:
+```JavaScript
+npm start
+```
 
-# ApiDoc
-Full Documented
+(Optimal)To generate new API document:
+```JavaScript
+npm run docs
+```
+
+# Create a new user
+
+Go to https://localhost:3000/api/register
+
+POST:
+
+```json
+{
+   "username":"Jhonny Cash",
+   "email": "jhonny@example.com",
+   "password": "123456",
+   "type": "Admin"
+}
+```
+
+To see all the methods available go to: http://localhost:3000/apidoc/
 
 # License
 MIT
