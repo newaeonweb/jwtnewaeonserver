@@ -1,5 +1,5 @@
 {
-  "name": "newaeonweserver",
+  "name": "jwtnewaeonweserver",
   "version": "1.0.0",
   "description": "JSON-SERVER API with JWT Authentication and ApiDoc",
   "main": "server.js",

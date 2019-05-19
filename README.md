@@ -1,5 +1,5 @@
 <h1 align="center">
-NewAeonServer Restful API
+JWT NewAeonServer Restful API
 </h1>
 
 <h3 align="center">Fake back-end Restful API powered by JsonWebToken, Json-Server and ApiDoc.<h3>
