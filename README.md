@@ -27,7 +27,7 @@ npm run docs
 
 # Create a new user
 
-Go to https://localhost:3000/api/register
+Go to http://localhost:3000/api/register
 
 POST:
 
