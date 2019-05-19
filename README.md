@@ -86,7 +86,12 @@ You receive this token in the success of the login endpoint, according to the fo
 
 # Adding your own endpoints
 
-It is very easy to add new endpoints, you can create them in the Json-Server database file: `db.json`, simply by adding new objects, you can read more about it [here](https://github.com/typicode/json-server).
+It is very easy to add new endpoints, you can create them in the **Json-Server** database file: `db.json`, simply by adding new objects, you can read more about it [here](https://github.com/typicode/json-server).
+
+# Why use this project?
+
+If you need to create **prototypes quickly** and unplugged for your front-end application, or you need to develop proof of concept about some Restful application, this project is for you.
+Since we have here common things in every application such as user authentication, login, signup, change password among other things.
 
 # License
 MIT
