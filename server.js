@@ -83,7 +83,7 @@ app.use((req, res, next) => {
   if (!token) {
     res
       .status(HTTP_STATUS.Unauthorized)
-      .send('Sorry, missing or malformed token');
+      .send({ error: 'Sorry, missing or malformed token' });
   } else {
     // Clean token string
     token = token.replace('Bearer ', '');
@@ -92,7 +92,7 @@ app.use((req, res, next) => {
       if (error) {
         return res
           .status(HTTP_STATUS.Unauthorized)
-          .send({ auth: false, message: 'Sorry invalid token' });
+          .send({ auth: false, error: 'Sorry invalid token' });
       } else {
         // Hold current user
         req.userId = decoded.id;
@@ -138,7 +138,8 @@ app.use((req, res, next) => {
  * @apiErrorExample Error-Response:
  *     HTTP/1.1 422 Unprocessable Entity
  *     {
- *       "Refresh Token failed"
+ *       "auth": "false",
+ *       "error": "Refresh Token failed"
  *     }
  */
 app.get('/api/token-refresh', (req, res) => {
@@ -150,7 +151,7 @@ app.get('/api/token-refresh', (req, res) => {
     if (error) {
       return res
         .status(HTTP_STATUS.UnprocessableEntity)
-        .send({ auth: false, message: 'Refresh Token failed' });
+        .send({ auth: false, error: 'Refresh Token failed' });
     }
     // Generate new Token
     let token = jwt.sign({ id: decoded.id }, SECRET_KEY, {
@@ -215,7 +216,7 @@ app.post('/api/register', (req, res) => {
   if (!email || !username || !password || !type) {
     return res
       .status(HTTP_STATUS.UnprocessableEntity)
-      .send('Missing one or more mantatory fields');
+      .send({ error: 'Missing one or more mantatory fields' });
   }
   // Create a new user object
   const newUser = {
@@ -262,18 +263,18 @@ app.post('/api/register', (req, res) => {
  * @apiErrorExample Error-Response:
  *     HTTP/1.1 400 Bad Request
  *     {
- *       "Sorry, email or password not provide"
+ *       "error": "Sorry, email or password not provide"
  *     }
  * @apiErrorExample Error-Response:
  *     HTTP/1.1 400 Bad Request
  *     {
- *       "Sorry, invalid combination of email and password"
+ *       "error": "Sorry, invalid combination of email and password"
  *     }
  *
  * @apiErrorExample Error-Response:
  *     HTTP/1.1 404 Not Found
  *     {
- *       "You don't have an account yet"
+ *       "error": "You don't have an account yet"
  *     }
  */
 app.post('/api/signup', (req, res) => {
@@ -283,7 +284,7 @@ app.post('/api/signup', (req, res) => {
   if (!payload.email || !payload.password) {
     return res
       .status(HTTP_STATUS.BadRequest)
-      .send('Sorry, email or password not provide');
+      .send({ error: 'Sorry, email or password not provide' });
   }
   // Get user from db
   let user = db
@@ -294,7 +295,7 @@ app.post('/api/signup', (req, res) => {
   if (user.length === 0) {
     return res
       .status(HTTP_STATUS.NotFound)
-      .send("You don't have an account yet");
+      .send({ error: "You don't have an account yet" });
   }
   // Set user
   user = user[0];
@@ -302,7 +303,7 @@ app.post('/api/signup', (req, res) => {
   if (user.password !== payload.password) {
     return res
       .status(HTTP_STATUS.BadRequest)
-      .send('Sorry, invalid combination of email and password');
+      .send({ error: 'Sorry, invalid combination of email and password' });
   }
   // Generate a Token
   const token = jwt.sign({ id: user.id }, SECRET_KEY, {
@@ -341,7 +342,7 @@ app.post('/api/signup', (req, res) => {
  * @apiErrorExample Error-Response:
  *     HTTP/1.1 400 Bad Request
  *     {
- *       "Your current password is invalid"
+ *       "error": "Your current password is invalid"
  *     }
  */
 app.post('/users/change-password', (req, res) => {
@@ -358,7 +359,7 @@ app.post('/users/change-password', (req, res) => {
   if (user.password !== password)
     return res
       .status(HTTP_STATUS.BadRequest)
-      .send('Your current password is invalid');
+      .send({ error: 'Your current password is invalid' });
   // Store the new Password
   db.get('users')
     .find({ id: req.userId })
@@ -395,7 +396,7 @@ app.post('/users/change-password', (req, res) => {
  * @apiErrorExample Error-Response:
  *     HTTP/1.1 422 Unprocessable Entity
  *     {
- *       "You don't have an account yet"
+ *       "error": "You don't have an account yet"
  *     }
  */
 app.post('/api/password-reset', (req, res) => {
@@ -410,7 +411,7 @@ app.post('/api/password-reset', (req, res) => {
   if (user.length == 0) {
     return res
       .status(HTTP_STATUS.NotFound)
-      .send("You don't have an account yet");
+      .send({ error: "You don't have an account yet" });
   }
   // Set User
   user = user[0];
@@ -448,7 +449,7 @@ app.post('/api/password-reset', (req, res) => {
  * @apiErrorExample Error-Response:
  *     HTTP/1.1 422 Unprocessable Entity
  *     {
- *       "Missing or invalid temporary Token"
+ *       "error": "Missing or invalid temporary Token"
  *     }
  */
 app.post('/api/password-reset-confirm', (req, res) => {
@@ -462,7 +463,7 @@ app.post('/api/password-reset-confirm', (req, res) => {
   if (!token) {
     return res
       .status(HTTP_STATUS.UnprocessableEntity)
-      .send('Missing or invalid temporary Token');
+      .send({ error: 'Missing or invalid temporary Token' });
   }
   // Get user and temporary Token
   db.get('users')
