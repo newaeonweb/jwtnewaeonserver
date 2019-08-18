@@ -91,19 +91,6 @@ textarea {
 /* ==========================================================================
    Author's custom styles
    ========================================================================== */
-/* Override defaults */
-:root {
-  --color-primary: #e78c14;
-  --color-lightGrey: #d2d6dd;
-  --color-grey: #7e818b;
-  --color-darkGrey: #3f4144;
-  --color-error: #d43939;
-  --color-success: #28bd14;
-  --grid-maxWidth: 120rem;
-  --grid-gutter: 2rem;
-  --font-size: 1.6rem;
-  --font-family: "Helvetica Neue", sans-serif;
-}
 
 h1 {
   font-family: 'Asar', serif;
