@@ -4,7 +4,6 @@
   "description": "JSON-SERVER API with JWT Authentication and ApiDoc",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
     "start:dev": "nodemon server.js",
     "docs": "./node_modules/.bin/apidoc -f server.js -o public/apidoc/"
