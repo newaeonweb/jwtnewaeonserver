@@ -18,6 +18,8 @@ A small deadly simple server, including endpoints to: Signup, Login, Refresh Tok
 
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
+[![Build Status](https://travis-ci.org/newaeonweb/jwtnewaeonserver.svg?branch=master)](https://travis-ci.org/newaeonweb/jwtnewaeonserver)
+
 Download or clone the repository.
 
 Install dependencies:
