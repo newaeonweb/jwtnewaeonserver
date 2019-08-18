@@ -16,6 +16,8 @@ A small deadly simple server, including endpoints to: Signup, Login, Refresh Tok
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/c239959f26624b18bea99295249b5373)](https://app.codacy.com/app/newaeonweb/jwtnewaeonserver?utm_source=github.com&utm_medium=referral&utm_content=newaeonweb/jwtnewaeonserver&utm_campaign=Badge_Grade_Dashboard)
 
+[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
+
 Download or clone the repository.
 
 Install dependencies:
